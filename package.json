@@ -1,0 +1,40 @@
+{
+  "name": "media-view-elm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:elm": "elm-make --output app.js ./src/App.elm",
+    "build:stylus": "./node_modules/.bin/stylus -o ./app.css ./src/app.styl",
+    "watch:elm": "elm-reactor",
+    "watch:stylus": "./node_modules/.bin/stylus -w -o ./app.css ./src/app.styl",
+    "_dev": "npm run watch:elm & npm run watch:stylus",
+    "_build": "npm run build:elm && npm run build:stylus",
+
+    "start": "webpack-dev-server --hot --inline --content-base src/",
+    "build": "rimraf dist && webpack",
+    "watch": "webpack --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^6.3.6",
+    "bootstrap-sass": "^3.3.6",
+    "copy-webpack-plugin": "^3.0.1",
+    "css-loader": "^0.23.1",
+    "elm-hot-loader": "^0.3.2",
+    "elm-webpack-loader": "^3.0.3",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.8.5",
+    "html-webpack-plugin": "^2.17.0",
+    "node-sass": "^3.7.0",
+    "postcss-loader": "^0.9.1",
+    "rimraf": "^2.5.2",
+    "sass-loader": "^3.2.0",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.13.1",
+    "webpack-dev-server": "^1.14.1",
+    "webpack-merge": "^0.13.0"
+  }
+}
