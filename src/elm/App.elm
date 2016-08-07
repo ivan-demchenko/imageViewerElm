@@ -1,42 +1,71 @@
 import Html exposing (Html, div, text)
-import Html.App as HtmlApp
+import Html.App as App
 import Html.Attributes exposing (class)
 
 import FilesList
 import Header
-import ListItem
 
-main = HtmlApp.beginnerProgram { model = model , view = view , update = update }
-
+main =
+  App.program
+    { init = init
+    , view = view
+    , update = update
+    , subscriptions = subscriptions
+    }
 
 
 -- Model
 
 type alias Model =
-  { listing: FilesList.Model
+  { filesList: FilesList.Model
   , appTitle: Header.Model
   }
 
-model : Model
-model =
-  Model { selected = 0, items = FilesList.mockItems } "My app"
+init : (Model, Cmd Msg)
+init =
+  let
+    ( filesListModel, flFx ) =
+      FilesList.init
+
+    ( headerModel, headerFx ) =
+      Header.init "My App"
+  in
+    ( Model filesListModel headerModel
+    , Cmd.batch
+      [ Cmd.map FilesListMsg flFx
+      , Cmd.map HeaderMsg headerFx
+      ]
+    )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.batch
+    [ Sub.map FilesListMsg (FilesList.subscriptions model.filesList)
+    , Sub.map HeaderMsg (Header.subscriptions model.appTitle)
+    ]
 
 
 
 -- Update
 
 type Msg
-  = FilesListActions FilesList.Msg
-  | HeaderActions Header.Msg
+  = FilesListMsg FilesList.Msg
+  | HeaderMsg Header.Msg
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    FilesListActions focus ->
-      { model | listing = FilesList.update focus model.listing }
+    FilesListMsg filesListMsg ->
+      let (flModel, flCmds) =
+        FilesList.update filesListMsg model.filesList
+      in
+        ( Model flModel model.appTitle
+        , Cmd.map FilesListMsg flCmds
+        )
 
-    HeaderActions x ->
-      model
+    HeaderMsg x ->
+      (model, Cmd.none)
 
 
 
@@ -44,15 +73,15 @@ update msg model =
 -- View
 
 view : Model -> Html Msg
-view model =
+view { appTitle, filesList } =
   div
     [ ]
-    [ HtmlApp.map HeaderActions (Header.view model.appTitle)
+    [ App.map HeaderMsg (Header.view appTitle)
     , div
         [ class "container-fluid" ]
         [ div
             [ class "row" ]
-            [ HtmlApp.map FilesListActions (FilesList.view model.listing)
+            [ App.map FilesListMsg (FilesList.view filesList)
             , div
                 [ class "col-md-8" ]
                 [ text "Hello!" ]

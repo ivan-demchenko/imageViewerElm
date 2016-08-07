@@ -1,11 +1,18 @@
-module FilesList exposing (Model, Msg, mockItems, view, update, model)
+module FilesList exposing (Model, Msg, init, subscriptions, mockItems, view, update)
 
 import ListItem
 import Html exposing (Html, div, text)
-import Html.App as HtmlApp
+import Html.App as App
 import Html.Attributes exposing (class)
+import Keyboard as KB exposing (..)
 
-main = HtmlApp.beginnerProgram { model = model , view = view , update = update }
+main =
+  App.program
+    { init = init
+    , view = view
+    , update = update
+    , subscriptions = subscriptions
+    }
 
 
 
@@ -29,34 +36,61 @@ mockItems =
   , IndexedItem 3 (ListItem.Model "file 1" False "File")
   ]
 
-model : Model
-model =
-  { selected = -1
-  , items = mockItems
-  }
+init : (Model, Cmd Msg)
+init =
+  (Model 0 mockItems, Cmd.none)
 
 
 -- Update
 
-type Msg =
-  Focus Int ListItem.Msg
+type Msg
+  = Focus Int ListItem.Msg
+  | KeyDown KB.KeyCode
 
 
-setFocus : Int -> Int -> ListItem.Msg -> IndexedItem -> IndexedItem
-setFocus prevSelected targetId msg {id, listItemModel} =
+setFocusOnItem : Int -> Int -> IndexedItem -> IndexedItem
+setFocusOnItem prevSelected targetId {id, listItemModel} =
   IndexedItem id (if (targetId == id) && (prevSelected /= targetId)
     then { listItemModel | focused = True }
     else { listItemModel | focused = False }
     )
 
+getSelectedIndex : Int -> Int -> Int -> Int
+getSelectedIndex dir currIdx listLen =
+  let
+    newIndex =
+      currIdx + dir
+  in
+    if newIndex < 0 then listLen - 1 else (
+      if newIndex >= listLen then 0 else newIndex
+    )
 
-update : Msg -> Model -> Model
+
+getFocusDirection : Int -> Int
+getFocusDirection keyCode =
+  if List.member keyCode [37,38,65,87] then -1 else (
+    if List.member keyCode [40,39,68,83] then 1 else 0
+  )
+
+
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg {selected, items} =
   case msg of
     Focus idx msg ->
-      { selected = idx
-      , items = (List.map (setFocus selected idx msg) items)
-      }
+      (Model idx (List.map (setFocusOnItem selected idx) items), Cmd.none)
+
+    KeyDown code ->
+      let
+        direction = getFocusDirection code
+        newIdx = getSelectedIndex direction selected (List.length items)
+      in
+        (Model newIdx (List.map (setFocusOnItem selected newIdx) items), Cmd.none)
+
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  KB.ups (\code -> KeyDown code)
 
 
 
@@ -64,7 +98,7 @@ update msg {selected, items} =
 
 renderItem : IndexedItem -> Html Msg
 renderItem {id, listItemModel} =
-  HtmlApp.map (Focus id) (ListItem.view listItemModel)
+  App.map (Focus id) (ListItem.view listItemModel)
 
 view : Model -> Html Msg
 view {selected, items} =

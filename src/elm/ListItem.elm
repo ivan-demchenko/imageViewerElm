@@ -42,10 +42,16 @@ getHtmlClass : Model -> String
 getHtmlClass item =
   "list-group-item" ++ (if item.focused then " active" else "")
 
+renderItem : Model -> Html Msg
+renderItem item =
+  if item.oftype == "Dir"
+    then text ("Dir : " ++ item.label)
+    else text ("File : " ++ item.label)
+
 view : Model -> Html Msg
 view item =
   a
     [ class (getHtmlClass item)
     , onClick Toggle
     ]
-    [ text (item.oftype ++ " : " ++ item.label) ]
+    [ renderItem item ]

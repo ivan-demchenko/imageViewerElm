@@ -1,22 +1,37 @@
-module Header exposing (Model, Msg, view, update)
+module Header exposing (Model, Msg, subscriptions, init, view, update)
 
 import Html exposing (Html, a, div, h1, nav, text)
-import Html.App exposing (beginnerProgram)
+import Html.App as App
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (class, href)
 
-main = beginnerProgram { model = "My App" , view = view , update = update }
-
+main =
+  App.program
+    { init = init "Test app"
+    , view = view
+    , update = update
+    , subscriptions = subscriptions
+    }
 
 
 type alias Model = String
 
-type Msg = Toggle
+type Msg = ToggleMenu
 
 
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.none
 
-update : Msg -> Model -> Model
-update msg model = model
+
+init : String -> (Model, Cmd Msg)
+init title =
+  (title, Cmd.none)
+
+
+update : Msg -> Model -> (Model, Cmd Msg)
+update msg model =
+  (model, Cmd.none)
 
 
 
