@@ -1,8 +1,8 @@
 {
     "version": "1.0.0",
-    "summary": "My test project",
-    "repository": "https://github.com/user/project.git",
-    "license": "BSD3",
+    "summary": "Elm implementation of the image viewer. Pet project upon which I learn Elm",
+    "repository": "https://github.com/raqystyle/imageViewerElm",
+    "license": "MIT",
     "source-directories": [
         "./src/elm"
     ],

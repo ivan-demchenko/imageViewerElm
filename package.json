@@ -1,7 +1,7 @@
 {
-  "name": "media-view-elm",
+  "name": "image-viewer-elm",
   "version": "1.0.0",
-  "description": "",
+  "description": "Elm implementation of the image viewer. Pet project upon which I learn Elm",
   "main": "index.js",
   "scripts": {
     "build:elm": "elm-make --output app.js ./src/App.elm",
@@ -10,13 +10,12 @@
     "watch:stylus": "./node_modules/.bin/stylus -w -o ./app.css ./src/app.styl",
     "_dev": "npm run watch:elm & npm run watch:stylus",
     "_build": "npm run build:elm && npm run build:stylus",
-
     "start": "webpack-dev-server --hot --inline --content-base src/",
     "build": "rimraf dist && webpack",
     "watch": "webpack --watch"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Ivan Demchenko",
+  "license": "MIT",
   "devDependencies": {
     "autoprefixer": "^6.3.6",
     "bootstrap-sass": "^3.3.6",
