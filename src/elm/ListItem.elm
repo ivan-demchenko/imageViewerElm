@@ -1,37 +1,29 @@
-module ListItem exposing (Model, Msg, view, update, model)
+module ListItem exposing (Model, Msg, view, update)
 
 import Html exposing (Html, a, span, i, text)
 import Html.App exposing (beginnerProgram)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (class)
 
-main = beginnerProgram { model = model , view = view , update = update }
-
-
-
 -- Model
 
 type alias Model =
   { label: String
+  , path: String
   , focused: Bool
   , oftype: String
   }
 
-model : Model
-model =
-  Model "Item 1" False "Dir"
-
-
 
 -- Update
 
-type Msg = Toggle
+type Msg = Select String
 
 
 update : Msg -> Model -> Model
 update msg item =
   case msg of
-    Toggle ->
+    Select itemPath ->
       { item | focused = not item.focused }
 
 
@@ -64,6 +56,19 @@ view : Model -> Html Msg
 view item =
   a
     [ class (getHtmlClass item)
-    , onClick Toggle
+    , onClick (Select item.path)
     ]
     [ viewItem item ]
+
+
+--- Etc
+
+main = beginnerProgram { model = model , view = view , update = update }
+
+model : Model
+model =
+  { label = "Item 1"
+  , path = "http://www.islands.com/sites/islands.com/files/styles/large_1x_/public/images/2016/01/shutterstock_230057017.jpg?itok=Z0Cqa_rc"
+  , focused = False
+  , oftype = "Dir"
+  }

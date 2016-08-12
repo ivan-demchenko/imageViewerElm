@@ -6,17 +6,8 @@ import Html.App as App
 import Html.Attributes exposing (class)
 import Keyboard as KB exposing (..)
 
-main =
-  App.program
-    { init = init
-    , view = view
-    , update = update
-    , subscriptions = subscriptions
-    }
 
-
-
--- Model
+-- MODEL
 
 type alias IndexedItem =
   { id: Int
@@ -24,28 +15,29 @@ type alias IndexedItem =
   }
 
 type alias Model =
-  { selected: Int
-  , items: List IndexedItem
+  { selected : Int
+  , currPath : String
+  , items : List IndexedItem
   }
 
 mockItems : List IndexedItem
 mockItems =
-  [ IndexedItem 0 (ListItem.Model "dir 1" False "Dir")
-  , IndexedItem 1 (ListItem.Model "file 1" False "File")
-  , IndexedItem 2 (ListItem.Model "file 1" False "File")
-  , IndexedItem 3 (ListItem.Model "file 1" False "File")
+  [ IndexedItem 0 (ListItem.Model "dir 1" "" False "Dir")
+  , IndexedItem 1 (ListItem.Model "file 1" "http://www.islands.com/sites/islands.com/files/styles/large_1x_/public/islamorada1666_copy.jpg?itok=tL01RE47" False "File")
+  , IndexedItem 2 (ListItem.Model "file 1" "http://www.islands.com/sites/islands.com/files/styles/large_1x_/public/images/2016/01/virgin_islands_national_park.jpg?itok=TcfQ0Cfz" False "File")
+  , IndexedItem 3 (ListItem.Model "file 1" "http://www.islands.com/sites/islands.com/files/styles/large_1x_/public/images/2016/01/shutterstock_230057017.jpg?itok=Z0Cqa_rc" False "File")
   ]
 
 init : (Model, Cmd Msg)
 init =
-  (Model 0 mockItems, Cmd.none)
+  (Model 0 "" mockItems, Cmd.none)
 
 
--- Update
+-- UPDATE
 
 type Msg
-  = Focus Int ListItem.Msg
-  | KeyDown KB.KeyCode
+  = Select Int String ListItem.Msg
+  | Highlight KB.KeyCode
 
 
 setFocusOnItem : Int -> Int -> IndexedItem -> IndexedItem
@@ -74,31 +66,34 @@ getFocusDirection keyCode =
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update msg {selected, items} =
+update msg {selected, currPath, items} =
   case msg of
-    Focus idx msg ->
-      (Model idx (List.map (setFocusOnItem selected idx) items), Cmd.none)
+    Select idx selectedPath msg ->
+      (Model idx selectedPath (List.map (setFocusOnItem selected idx) items), Cmd.none)
 
-    KeyDown code ->
+    Highlight keyCode ->
       let
-        direction = getFocusDirection code
+        direction = getFocusDirection keyCode
         newIdx = getSelectedIndex direction selected (List.length items)
       in
-        (Model newIdx (List.map (setFocusOnItem selected newIdx) items), Cmd.none)
+        (Model newIdx currPath (List.map (setFocusOnItem selected newIdx) items), Cmd.none)
 
 
+
+-- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  KB.ups (\code -> KeyDown code)
+  KB.ups Highlight
 
 
 
--- View
+-- VIEW
 
 renderItem : IndexedItem -> Html Msg
 renderItem {id, listItemModel} =
-  App.map (Focus id) (ListItem.view listItemModel)
+  App.map (Select id listItemModel.path) (ListItem.view listItemModel)
+
 
 view : Model -> Html Msg
 view {selected, items} =
@@ -109,3 +104,14 @@ view {selected, items} =
         [ class "list-group" ]
         (List.map renderItem items)
     ]
+
+
+-- ETC
+
+main =
+  App.program
+    { init = init
+    , view = view
+    , update = update
+    , subscriptions = subscriptions
+    }

@@ -4,6 +4,7 @@ import Html.Attributes exposing (class)
 
 import FilesList
 import Header
+import ImageView
 
 main =
   App.program
@@ -14,11 +15,13 @@ main =
     }
 
 
--- Model
+
+-- MODEL
 
 type alias Model =
   { filesList: FilesList.Model
   , appTitle: Header.Model
+  , currImage: ImageView.Model
   }
 
 init : (Model, Cmd Msg)
@@ -28,15 +31,22 @@ init =
       FilesList.init
 
     ( headerModel, headerFx ) =
-      Header.init "My App"
+      Header.init "Image Viewer"
+
+    ( imageViewModel, imageViewFx ) =
+      ImageView.init ""
   in
-    ( Model filesListModel headerModel
+    ( Model filesListModel headerModel imageViewModel
     , Cmd.batch
       [ Cmd.map FilesListMsg flFx
       , Cmd.map HeaderMsg headerFx
+      , Cmd.map ImageViewMsg imageViewFx
       ]
     )
 
+
+
+-- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -47,30 +57,41 @@ subscriptions model =
 
 
 
--- Update
+-- UPDATE
 
 type Msg
   = FilesListMsg FilesList.Msg
   | HeaderMsg Header.Msg
+  | ImageViewMsg ImageView.Msg
+
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update msg model =
+update msg appModel =
   case msg of
     FilesListMsg filesListMsg ->
-      let (flModel, flCmds) =
-        FilesList.update filesListMsg model.filesList
+      let
+        (flModel, flCmds) =
+          FilesList.update filesListMsg appModel.filesList
       in
-        ( Model flModel model.appTitle
-        , Cmd.map FilesListMsg flCmds
+        ( { appModel | filesList = flModel }
+        , Cmd.map (FilesListMsg) flCmds
         )
 
     HeaderMsg x ->
-      (model, Cmd.none)
+      (appModel, Cmd.none)
+
+    ImageViewMsg imageViewMsg ->
+      let
+        (newImgURL, imageViewCmds) =
+          ImageView.update imageViewMsg appModel.currImage
+      in
+        ( appModel
+        , Cmd.map ImageViewMsg imageViewCmds
+        )
 
 
 
-
--- View
+-- VIEW
 
 view : Model -> Html Msg
 view { appTitle, filesList } =
@@ -82,9 +103,7 @@ view { appTitle, filesList } =
         [ div
             [ class "row" ]
             [ App.map FilesListMsg (FilesList.view filesList)
-            , div
-                [ class "col-md-8" ]
-                [ text "Hello!" ]
+            , App.map ImageViewMsg (ImageView.view filesList.currPath)
             ]
         ]
     ]
