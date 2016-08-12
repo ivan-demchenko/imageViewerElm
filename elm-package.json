@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "Elm implementation of the image viewer. Pet project upon which I learn Elm",
-    "repository": "https://github.com/raqystyle/imageViewerElm",
+    "repository": "https://github.com/raqystyle/imageviewerelm.git",
     "license": "MIT",
     "source-directories": [
         "./src/elm"
