@@ -6,6 +6,7 @@ import FilesList
 import Header
 import ImageView
 
+main : Program Never
 main =
   App.program
     { init = init

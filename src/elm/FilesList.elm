@@ -108,6 +108,7 @@ view {selected, items} =
 
 -- ETC
 
+main : Program Never
 main =
   App.program
     { init = init

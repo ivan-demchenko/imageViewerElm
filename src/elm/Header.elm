@@ -2,9 +2,9 @@ module Header exposing (Model, Msg, subscriptions, init, view, update)
 
 import Html exposing (Html, a, div, h1, nav, text)
 import Html.App as App
-import Html.Events exposing (onClick)
 import Html.Attributes exposing (class, href)
 
+main : Program Never
 main =
   App.program
     { init = init "Test app"

@@ -63,6 +63,7 @@ view item =
 
 --- Etc
 
+main : Program Never
 main = beginnerProgram { model = model , view = view , update = update }
 
 model : Model
